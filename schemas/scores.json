@@ -1,0 +1,49 @@
+{
+    "name": "scores",
+    "count": 1000,
+    "output": "scores.json",
+    "$jsonSchema": {
+        "properties": {
+            "name": {
+                "bsonType": "string",
+                "description": "#name#"
+            },
+            "address": {
+                "bsonType": "object",
+                "required": [
+                    "zipcode"
+                ],
+                "properties": {
+                    "street": {
+                        "bsonType": "string",
+                        "description": "#street_address#"
+                    },
+                    "zipcode": {
+                        "bsonType": "string",
+                        "description": "#zipcode#"
+                    }
+                }
+            },
+            "contacts": {
+                "bsonType": "array",
+                "items": {
+                    "bsonType": "object",
+                    "properties": {
+                        "name": {
+                            "bsonType": "string",
+                            "description": "#name#"
+                        },
+                        "country_code": {
+                            "bsonType": "string",
+                            "description": "#country_calling_code#"
+                        },
+                        "number": {
+                            "bsonType": "string",
+                            "description": "#msisdn#"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

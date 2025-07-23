@@ -1,6 +1,8 @@
 # mock.py
 import sys
 from libs.mock_data import MockData
+from libs.providers.ejson_provider import EJsonProvider
+from libs.providers.mongodb_provider import MongoDBProvider
 from libs.utils import *
 from bson import json_util
 import os
@@ -27,18 +29,33 @@ def read_schemas():
     logger.info(bold(green("All schemas loaded successfully.")))
     return schemas
 
+def add_providers(mock_data):
+    """
+    Add output providers to the MockData instance based on the configuration.
+    """
+    config = load_config()
+    output_provider_config = config.get("output", {})
+    if "ejson" in output_provider_config:
+        mock_data.add_provider(EJsonProvider(output_provider_config["ejson"]))
+    if "mongodb" in output_provider_config:
+        mock_data.add_provider(MongoDBProvider(output_provider_config["mongodb"]))
+
 spinner = ['|', '/', '-', '\\']
 if __name__ == "__main__":
+    config = load_config()
     schemas = read_schemas()
     logger.info(cyan("Mocking data based on the provided schemas."))
     for name, schema in schemas.items():
+        schema["name"] = name if "name" not in schema else schema["name"]
         mock_data = MockData(schema)
-        objects = mock_data.mock()
+        add_providers(mock_data)
+        objects = mock_data.run()
         processed_count = 0
         for obj in objects:
-            ejson = json_util.dumps(obj)
-            logger.debug(f"Generated object for schema {name}: {ejson}")
-            # TODO: Save or process the generated object as needed
             processed_count += 1
             sys.stdout.write(f"\r{spinner[processed_count % len(spinner)]} {round(processed_count / mock_data._count * 100, 2)}%")
             sys.stdout.flush()
+        mock_data.close()
+        sys.stdout.write("\r")
+        sys.stdout.flush()
+        logger.info(bold(green(f"Successfully mocked {processed_count} objects for schema: {schema['name']}")))

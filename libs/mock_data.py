@@ -2,6 +2,7 @@ from datetime import date, datetime
 from multiprocessing import get_logger
 from bson import Binary, ObjectId
 from faker import Faker
+from libs.providers.output_provider import OutputProvider
 from libs.utils import *
 from libs.object_id_provider import ObjectIdProvider
 import re
@@ -10,23 +11,47 @@ import uuid
 
 class MockData:
     def __init__(self, schema: dict):
-        self._schema = schema
-        self._count = self._schema.get("count", 1)
-        self._name = self._schema.get('name', '(Unknown schema)')
         self._fake = Faker()
         self._fake.add_provider(ObjectIdProvider)
+        self._schema = schema
+        self._count = self._schema.get("count", 1)
+        self._name = self._schema.get('name', f'{self._fake.slug()}')
         self._logger = get_logger(__name__)
         self._exp_pattern = re.compile(r"\#(\w+)(?:\((.*?)\))?\#")
+        self._output_providers = []
 
-    def mock(self):
+    def add_provider(self, provider):
+        """
+        Add a custom provider to the Faker instance.
+        """
+        if not isinstance(provider, OutputProvider):
+            self._logger.fatal(red(f"Provider {provider} is not an instance of BaseProvider."))
+            sys.exit(1)
+        provider.set_name(self._name)
+        self._output_providers.append(provider)
+
+    def run(self):
         """
         Mock data based on the provided schema name and data.
         The function will be called recursively for nested schemas.
         """
         self._logger.info(f"Processing schema: {cyan(self._name)}")
 
+        def get_result():
+            result = self._mock_fields(self._schema.get("$jsonSchema", {}).get("properties", {}))
+            for provider in self._output_providers:
+                provider.write(result)
+            return result
+
         for _ in range(self._count):
-            yield self._mock_fields(self._schema.get("$jsonSchema", {}).get("properties", {}))
+            yield get_result()
+    
+    def close(self):
+        """
+        Close all output providers.
+        """
+        for provider in self._output_providers:
+            provider.close()
 
     def _mock_fields(self, properties):
         """

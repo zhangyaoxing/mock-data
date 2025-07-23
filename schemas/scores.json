@@ -1,6 +1,6 @@
 {
     "name": "scores",
-    "count": 100000,
+    "count": 10000,
     "output": "scores.json",
     "$jsonSchema": {
         "properties": {

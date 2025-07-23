@@ -1,12 +1,32 @@
 {
     "name": "scores",
-    "count": 1000,
+    "count": 100,
     "output": "scores.json",
     "$jsonSchema": {
         "properties": {
+            "_id": {
+                "bsonType": "objectId",
+                "description": "#object_id# // generate a random ObjectId"
+            },
+            "uuid_str": {
+                "bsonType": "string",
+                "description": "#uuid4# // generate a random UUID but save it as a string"
+            },
+            "uuid_bin": {
+                "bsonType": "binData",
+                "description": "#uuid4# // generate a random UUID in binary format"
+            },
             "name": {
                 "bsonType": "string",
-                "description": "#name#"
+                "description": "#name# // if there's no parameters you can just use name with or without (), otherwise use name(param1,param2) to generate a name with parameters"
+            },
+            "birthdate": {
+                "bsonType": "date",
+                "description": "#date_of_birth(None, 18, 25)# // generate a random birthday. The age range is 18 to 25 years old."
+            },
+            "introduction": {
+                "bsonType": "string",
+                "description": "#sentence(50)# // generate a random text with length 50 words."
             },
             "address": {
                 "bsonType": "object",
@@ -33,7 +53,7 @@
                             "bsonType": "string",
                             "description": "#name#"
                         },
-                        "country_code": {
+                        "country_calling_code": {
                             "bsonType": "string",
                             "description": "#country_calling_code#"
                         },
@@ -42,7 +62,9 @@
                             "description": "#msisdn#"
                         }
                     }
-                }
+                },
+                "minItems": 1,
+                "maxItems": 3
             }
         }
     }

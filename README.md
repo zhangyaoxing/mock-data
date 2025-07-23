@@ -61,9 +61,9 @@ The tool supports output to several different destinations:
 
 All providers are configured in the `/config.json` sub property `output`.
 
-#### 2.3.1 EJSON Provider
-Configure the following parameters:
-- `output.ejson.folder`: Required. Configure the output folder. The tool will use the schema name as output name, with a `.ejson` suffix.
-
-#### 2.3.2 MongoDB Provider
-COnfigure the following parameters:
+| Provider |          Property           |                                                                           Description                                                                           |
+| :------: | :-------------------------: | :-------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|  EJSON   |    `output.ejson.folder`    | **Required**. Configure the output folder. The tool will use the schema name as output name, with a `.ejson` suffix.                                            |
+| MongoDB  |    `output.mongodb.uri`     | **Required**. Configure the MongoDB connection string. The tool will use the schema name as the output collection.                                              |
+| MongoDB  | `output.mongodb.batch_size` | Optional. Configure the batch insert size. <br />If configuired, the tool will wait until it has enough documents, then use `insertMany` to insert all of them. |
+|  Kafka   |     `output.kafka.uri`      | **Required**. (To be done)                                                                                                                                      |

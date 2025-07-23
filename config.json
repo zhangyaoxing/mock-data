@@ -2,6 +2,10 @@
     "output": {
         "ejson": {
             "folder": "output/"
+        },
+        "mongodb": {
+            "uri": "mongodb://localhost:27017/mock_data",
+            "batch_size": 1000
         }
     }
 }

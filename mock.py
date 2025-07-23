@@ -36,8 +36,9 @@ if __name__ == "__main__":
         objects = mock_data.mock()
         processed_count = 0
         for obj in objects:
-            logger.debug(f"Generated object for schema {name}: {json_util.dumps(obj, indent=2)}")
+            ejson = json_util.dumps(obj)
+            logger.debug(f"Generated object for schema {name}: {ejson}")
             # TODO: Save or process the generated object as needed
             processed_count += 1
-            sys.stdout.write(f"\r{spinner[processed_count % len(spinner)]} {processed_count}/{mock_data._count}")
+            sys.stdout.write(f"\r{spinner[processed_count % len(spinner)]} {round(processed_count / mock_data._count * 100, 2)}%")
             sys.stdout.flush()

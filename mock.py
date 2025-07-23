@@ -1,4 +1,5 @@
 # mock.py
+import sys
 from libs.mock_data import MockData
 from libs.utils import *
 from bson import json_util
@@ -26,9 +27,17 @@ def read_schemas():
     logger.info(bold(green("All schemas loaded successfully.")))
     return schemas
 
+spinner = ['|', '/', '-', '\\']
 if __name__ == "__main__":
     schemas = read_schemas()
     logger.info(cyan("Mocking data based on the provided schemas."))
     for name, schema in schemas.items():
-        obj = MockData(schema).mock()
-        print(json_util.dumps(obj, indent=2))
+        mock_data = MockData(schema)
+        objects = mock_data.mock()
+        processed_count = 0
+        for obj in objects:
+            logger.debug(f"Generated object for schema {name}: {json_util.dumps(obj, indent=2)}")
+            # TODO: Save or process the generated object as needed
+            processed_count += 1
+            sys.stdout.write(f"\r{spinner[processed_count % len(spinner)]} {processed_count}/{mock_data._count}")
+            sys.stdout.flush()

@@ -11,6 +11,8 @@ import uuid
 class MockData:
     def __init__(self, schema: dict):
         self._schema = schema
+        self._count = self._schema.get("count", 1)
+        self._name = self._schema.get('name', '(Unknown schema)')
         self._fake = Faker()
         self._fake.add_provider(ObjectIdProvider)
         self._logger = get_logger(__name__)
@@ -21,9 +23,9 @@ class MockData:
         Mock data based on the provided schema name and data.
         The function will be called recursively for nested schemas.
         """
-        self._logger.info(f"Processing schema: {cyan(self._schema.get('name', '(Unknown schema)'))}")
-        count = self._schema.get("count", 1)
-        for _ in range(count):
+        self._logger.info(f"Processing schema: {cyan(self._name)}")
+
+        for _ in range(self._count):
             yield self._mock_fields(self._schema.get("$jsonSchema", {}).get("properties", {}))
 
     def _mock_fields(self, properties):
@@ -120,7 +122,6 @@ class MockData:
                     self._logger.fatal(red(f"Unsupported bsonType {bson_type} for field {field_name}."))
                     sys.exit(1)
             obj[field_name] = converted_value
-
         return obj
 
     def _resolve_description(self, description):

@@ -30,7 +30,7 @@ def get_script_path(filename = None):
         return str((script_folder / ".." / filename).resolve())
     
 config = None
-def load_config(quiet):
+def load_config():
     global config
     if config == None:
         config_path = get_script_path("config.json")

@@ -8,8 +8,7 @@
             "batch_size": 1000
         },
         "kafka": {
-            "bootstrap_servers": "localhost:9092",
-            "topic": "mock_data"
+            "bootstrap_servers": "localhost:9092"
         }
     }
 }

@@ -49,6 +49,8 @@ When you define the schemas, fill in the `description` field an expression in th
 - `date_of_birth(None, 18, 25)`: Generate a random birthday using [date_of_birth](https://faker.readthedocs.io/en/stable/providers/faker.providers.date_time.html#faker.providers.date_time.Provider.date_of_birth). The age range is 18 to 25 years old.
 - `#sentence(50)#`: Generate a random text with length 50 words using [sentence](https://faker.readthedocs.io/en/stable/providers/faker.providers.lorem.html#faker.providers.lorem.Provider.sentence).
 
+An exception is the `enum` values, which is already defined by json schema. So we utilize the json schema style instead of using `Faker` library. An example of using `enum` values can be found in [schemas/fruit.json](https://github.com/zhangyaoxing/mock-data/blob/main/schemas/fruit.json)
+
 To know which generator methods are available, checkout the [Standard Providers](https://faker.readthedocs.io/en/stable/providers.html) page, where you can find generator methods under each provider.
 
 A full example can be found in [schemas/scores.json](https://github.com/zhangyaoxing/mock-data/blob/main/schemas/scores.json).

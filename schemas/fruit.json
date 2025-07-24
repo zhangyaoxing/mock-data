@@ -1,6 +1,6 @@
 {
     "name": "fruit",
-    "count": 100,
+    "count": 9999,
     "$jsonSchema": {
         "bsonType": "object",
         "properties": {
@@ -18,8 +18,8 @@
                 ]
             },
             "weight": {
-                "bsonType": "double",
-                "description": "#pyfloat(None, 2, True, 0.1, 5.0)# // generate a random float between 0.1 and 10.0"
+                "bsonType": "decimal",
+                "description": "#pyfloat(None, 2, True, 0.1, 5.0)# // generate a random positive float with 2 decimal places between 0.1 and 5.0"
             }
         },
         "required": [

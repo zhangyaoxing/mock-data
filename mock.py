@@ -3,6 +3,7 @@ import sys
 from libs.mock_data import MockData
 from libs.providers.ejson_provider import EJsonProvider
 from libs.providers.mongodb_provider import MongoDBProvider
+from libs.providers.kafka_provider import KafkaProvider
 from libs.utils import *
 from bson import json_util
 import os
@@ -39,6 +40,8 @@ def add_providers(mock_data):
         mock_data.add_provider(EJsonProvider(output_provider_config["ejson"]))
     if "mongodb" in output_provider_config:
         mock_data.add_provider(MongoDBProvider(output_provider_config["mongodb"]))
+    if "kafka" in output_provider_config:
+        mock_data.add_provider(KafkaProvider(output_provider_config["kafka"]))
 
 spinner = ['|', '/', '-', '\\']
 if __name__ == "__main__":

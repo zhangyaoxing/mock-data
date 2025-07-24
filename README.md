@@ -22,7 +22,7 @@ In each schema file, you can define the following properties:
 - `output`: Optional. Output file path. Defaults to `output/`.
 - `$jsonSchema`: Required. The JSON schema. [JSON schema](https://json-schema.org/) is a 3rd-party standard for defining schemas for JSON. You can find details in the website. In the [MongoDB document](https://www.mongodb.com/docs/manual/reference/operator/query/jsonSchema/) you can also find some examples.
 
-The following matrix shows which MongoDB data types are supported by this tool. Use `Alias` when you define the data types in the schema file.
+The following matrix shows which MongoDB data types are supported by this tool. Use `Number` or `Alias` when you define the data types in the schema file.
 |        Type        | Number |   Alias    | Supported |
 |:------------------:|:------:|:----------:|:---------:|
 |       Double       |   1    |   double   |  &check;  |

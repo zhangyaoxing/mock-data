@@ -1,6 +1,7 @@
 from datetime import date, datetime
+from decimal import Decimal
 from multiprocessing import get_logger
-from bson import Binary, ObjectId
+from bson import Binary, Decimal128, ObjectId
 from faker import Faker
 from libs.providers.output_provider import OutputProvider
 from libs.utils import *
@@ -8,6 +9,26 @@ from libs.object_id_provider import ObjectIdProvider
 import re
 import sys
 import uuid
+
+BSON_TYPES = {
+    "1": "double",
+    "2": "string",
+    "3": "object",
+    "4": "array",
+    "5": "binData",
+    "7": "objectId",
+    "8": "bool",
+    "9": "date",
+    "10": "null",
+    "11": "regex",
+    "13": "javascript",
+    "16": "int",
+    "17": "timestamp",
+    "18": "long",
+    "19": "decimal",
+    "-1": "minKey",
+    "127": "maxKey"
+}
 
 class MockData:
     def __init__(self, schema: dict):
@@ -60,6 +81,7 @@ class MockData:
         obj = {}
         for field_name, field_schema in properties.items():
             bson_type = field_schema.get("bsonType", None)
+            bson_type = BSON_TYPES.get(bson_type, bson_type)
             enum = field_schema.get("enum", None)
             if not bson_type:
                 self._logger.fatal(red(f"Field {field_name} has no bsonType defined."))
@@ -132,7 +154,8 @@ class MockData:
                         sys.exit(1)
                 case "decimal":
                     try:
-                        converted_value = float(value)
+                        value = Decimal(str(value)) if isinstance(value, (int, float, str)) else value
+                        converted_value = Decimal128(value)
                     except ValueError:
                         self._logger.fatal(red(f"Expected decimal for field {field_name}, got {type(value)}."))
                         sys.exit(1)

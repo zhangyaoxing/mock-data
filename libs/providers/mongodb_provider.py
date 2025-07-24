@@ -19,18 +19,19 @@ class MongoDBProvider(OutputProvider):
         self._db = self._client.get_default_database()
         self._logger.debug(f"Connected to MongoDB at {uri}")
 
+    def _insert(self, docs):
+        if self._collection is None:
+            self._collection = self._db[self._name]
+        self._collection.insert_many(docs)
+        self._logger.debug(f"Inserted {len(docs)} documents into collection {self._name}")
     def write(self, data):
         self._docs.append(data)
         if len(self._docs) >= self._batch_size:
-            if self._collection is None:
-                self._collection = self._db[self._name]
-            self._collection.insert_many(self._docs)
-            self._logger.debug(f"Inserted {len(self._docs)} documents into collection {self._name}")
+            self._insert(self._docs)
             self._docs = []
 
     def close(self):
         if self._client:
             if len(self._docs) > 0:
-                self._collection.insert_many(self._docs)
-                self._logger.debug(f"Inserted remaining {len(self._docs)} documents into collection {self._name}")
+                self._insert(self._docs)
             self._client.close()

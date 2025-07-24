@@ -180,6 +180,10 @@ class MockData:
                 converted_params.append(True if param == "true" else False)
             elif param == "null" or param == "none":
                 converted_params.append(None)
+            elif re.match(r"^\'(.*)\'$", param):
+                converted_params.append(re.match(r"^\'(.*)\'$", param).group(1))
+            elif re.match(r'^"(.*)"$', param):
+                converted_params.append(re.match(r'^"(.*)"$', param).group(1))
             else:
                 converted_params.append(param)
 

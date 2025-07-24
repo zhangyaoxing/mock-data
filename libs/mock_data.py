@@ -60,20 +60,27 @@ class MockData:
         obj = {}
         for field_name, field_schema in properties.items():
             bson_type = field_schema.get("bsonType", None)
+            enum = field_schema.get("enum", None)
             if not bson_type:
                 self._logger.fatal(red(f"Field {field_name} has no bsonType defined."))
                 sys.exit(1)
             if bson_type != "object" and bson_type != "array":
                 description = field_schema.get("description", None)
-                if not description:
-                    self._logger.fatal(red(f"Field {field_name} has no description defined."))
+                if description:
+                    value_desc = self._resolve_description(description)
+                    gen_method = getattr(self._fake, value_desc["gen_method"], None)
+                    if not gen_method:
+                        self._logger.fatal(red(f"Generator method {value_desc['gen_method']} not found for field {field_name}."))
+                        sys.exit(1)
+                    value = gen_method(*value_desc["params"])
+                elif enum:
+                    if not isinstance(enum, list) or len(enum) == 0:
+                        self._logger.fatal(red(f"Enum for field {field_name} must be a non-empty list."))
+                        sys.exit(1)
+                    value = self._fake.random_element(elements=enum)
+                else:
+                    self._logger.fatal(red(f"Field {field_name} has no description or enum defined."))
                     sys.exit(1)
-                value_desc = self._resolve_description(description)
-                gen_method = getattr(self._fake, value_desc["gen_method"], None)
-                if not gen_method:
-                    self._logger.fatal(red(f"Generator method {value_desc['gen_method']} not found for field {field_name}."))
-                    sys.exit(1)
-                value = gen_method(*value_desc["params"])
             match bson_type:
                 case "double":
                     try:

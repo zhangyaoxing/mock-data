@@ -3,6 +3,7 @@
     "count": 9999,
     "output": "scores.json",
     "$jsonSchema": {
+        "bsonType": "object",
         "properties": {
             "_id": {
                 "bsonType": "objectId",

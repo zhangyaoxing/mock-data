@@ -47,24 +47,31 @@ When you define the schemas, fill in the `description` field an expression in th
 - `#name#` or `#name()#`: Generate a random name using method [name](https://faker.readthedocs.io/en/stable/providers/faker.providers.person.html#faker.providers.person.Provider.name).
 - `date_of_birth(None, 18, 25)`: Generate a random birthday using [date_of_birth](https://faker.readthedocs.io/en/stable/providers/faker.providers.date_time.html#faker.providers.date_time.Provider.date_of_birth). The age range is 18 to 25 years old.
 - `#sentence(50)#`: Generate a random text with length 50 words using [sentence](https://faker.readthedocs.io/en/stable/providers/faker.providers.lorem.html#faker.providers.lorem.Provider.sentence).
+- More examples can be found in [schemas/scores.json](https://github.com/zhangyaoxing/mock-data/blob/main/schemas/scores.json).
+- To know which generator methods are available, checkout the [Standard Providers](https://faker.readthedocs.io/en/stable/providers.html) page, where you can find generator methods under each provider.
 
 An exception is the `enum` values, which is already defined by json schema. So we utilize the json schema style instead of using `Faker` library. An example of using `enum` values can be found in [schemas/fruit.json](https://github.com/zhangyaoxing/mock-data/blob/main/schemas/fruit.json)
 
-To know which generator methods are available, checkout the [Standard Providers](https://faker.readthedocs.io/en/stable/providers.html) page, where you can find generator methods under each provider.
+### 2.3 Type Mismatch
+If the data generated doesn't match the `bsonType` defined in the schema, the tool will try to convert to the right type. For example,
+- You defined `{"bsonType": "string"}`
+- You use `#uuid4#` which generates `UUID`
 
-A full example can be found in [schemas/scores.json](https://github.com/zhangyaoxing/mock-data/blob/main/schemas/scores.json).
+The `UUID` will be converted to a `string`. ([Example](https://github.com/zhangyaoxing/mock-data/blob/main/schemas/scores.json#L11-L14))
+
+However, auto conversion is not always possible. Please try to use the correct data types as possible.
 
 ### 2.3 Output Providers
 The tool supports output to several different destinations:
 - To a file in [EJSON](https://www.mongodb.com/docs/manual/reference/mongodb-extended-json/) format.
 - To a MongoDB collection.
-- To a Kafka queue.
+- To a Kafka topic.
 
 All providers are configured in the `/config.json` sub property `output`.
 
-| Provider |          Property           |                                                                           Description                                                                           |
-| :------: | :-------------------------: | :-------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-|  EJSON   |    `output.ejson.folder`    | **Required**. Configure the output folder. The tool will use the schema name as output name, with a `.ejson` suffix.                                            |
-| MongoDB  |    `output.mongodb.uri`     | **Required**. Configure the MongoDB connection string. The tool will use the schema name as the output collection.                                              |
-| MongoDB  | `output.mongodb.batch_size` | Optional. Configure the batch insert size. <br />If configuired, the tool will wait until it has enough documents, then use `insertMany` to insert all of them. |
-|  Kafka   |     `output.kafka.uri`      | **Required**. (To be done)                                                                                                                                      |
+| Provider |             Property             |                                                                           Description                                                                           |
+| :------: | :------------------------------: | :-------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|  EJSON   |      `output.ejson.folder`       | **Required**. Configure the output folder. The tool will use the schema name as output name, with a `.ejson` suffix.                                            |
+| MongoDB  |       `output.mongodb.uri`       | **Required**. Configure the MongoDB connection string. The tool will use the schema name as the output collection.                                              |
+| MongoDB  |   `output.mongodb.batch_size`    | Optional. Configure the batch insert size. <br />If configuired, the tool will wait until it has enough documents, then use `insertMany` to insert all of them. |
+|  Kafka   | `output.kafka.bootstrap_servers` | **Required**. Configure the Kafka bootstrap server address. The tool will use the schema name as Kafka topic name.                                              |

@@ -1,7 +1,6 @@
 {
     "name": "scores",
     "count": 999,
-    "output": "scores.json",
     "$jsonSchema": {
         "bsonType": "object",
         "properties": {

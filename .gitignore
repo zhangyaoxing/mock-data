@@ -206,4 +206,17 @@ marimo/_static/
 marimo/_lsp/
 __marimo__/
 
+# Project specific
 output/
+/data/*.ejson
+!/data/.gitkeep
+config.json
+!config/config.json
+
+# IDE
+.DS_Store
+
+# Temporary files
+*.tmp
+*.bak
+*.orig

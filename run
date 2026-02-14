@@ -1,2 +1,12 @@
 #!/bin/bash
-python3 mock.py
+
+# Wrapper script to run mockdata
+# Supports both old (libs/) and new (src/mockdata/) structures
+
+if [ -d "src/mockdata" ]; then
+    # New structure - use the installed package or module
+    python3 -m mockdata "$@"
+else
+    # Legacy structure - fall back to old script
+    python3 mock.py "$@"
+fi

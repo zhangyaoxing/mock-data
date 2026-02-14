@@ -1,0 +1,12 @@
+include README.md
+include LICENSE
+include requirements.txt
+include pyproject.toml
+recursive-include src/mockdata *.py
+recursive-include schemas *.json
+recursive-include config *.json
+prune tests
+prune docs
+global-exclude __pycache__
+global-exclude *.py[co]
+global-exclude .DS_Store

@@ -1,0 +1,8 @@
+# Additional .pylintrc for compatibility
+# (pyproject.toml configuration takes precedence)
+
+[MESSAGES CONTROL]
+disable=W0511
+
+[FORMAT]
+max-line-length=100

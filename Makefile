@@ -21,6 +21,7 @@ coverage:  ## Run tests with coverage report
 
 lint:  ## Run code quality checks
 	flake8 src tests
+	pylint src
 	mypy src
 
 format:  ## Format code with black and isort

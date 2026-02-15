@@ -22,17 +22,17 @@ class MongoDBProvider(OutputProvider):
         self._client: Optional[MongoClient] = None
         self._db: Optional[Database] = None
         self._collection: Optional[Collection] = None
-        self._batch_size = config.get('batch_size', 1000)
+        self._batch_size = config.get("batch_size", 1000)
         self._docs: List[dict] = []
         self._connect_to_mongodb()
-        self._logger.debug(f"Initialized MongoDBProvider with config: {config}")
+        self._logger.debug("Initialized MongoDBProvider with config: %s", config)
 
     def _connect_to_mongodb(self) -> None:
         """Establish connection to MongoDB."""
-        uri = self._config.get('uri', 'mongodb://localhost:27017/test')
+        uri = self._config.get("uri", "mongodb://localhost:27017/test")
         self._client = MongoClient(uri)
         self._db = self._client.get_default_database()
-        self._logger.debug(f"Connected to MongoDB at {uri}")
+        self._logger.debug("Connected to MongoDB at %s", uri)
 
     def _insert(self, docs: List[dict]) -> None:
         """Insert documents into MongoDB.
@@ -42,9 +42,9 @@ class MongoDBProvider(OutputProvider):
         """
         if self._collection is None:
             self._collection = self._db[self._name]
-        
+
         self._collection.insert_many(docs)
-        self._logger.debug(f"Inserted {len(docs)} documents into collection {self._name}")
+        self._logger.debug("Inserted %d documents into collection %s", len(docs), self._name)
 
     def write(self, data: dict) -> None:
         """Buffer data and write in batches to MongoDB.

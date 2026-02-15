@@ -18,9 +18,9 @@ class KafkaProvider(OutputProvider):
         super().__init__(config)
         self._producer = KafkaProducer(
             bootstrap_servers=config.get("bootstrap_servers", "localhost:9092"),
-            value_serializer=lambda v: json_util.dumps(v).encode('utf-8')
+            value_serializer=lambda v: json_util.dumps(v).encode("utf-8"),
         )
-        self._logger.debug(f"Initialized KafkaProvider with config: {config}")
+        self._logger.debug("Initialized KafkaProvider with config: %s", config)
 
     def write(self, data: dict) -> None:
         """Write data to Kafka topic.
@@ -30,7 +30,7 @@ class KafkaProvider(OutputProvider):
         """
         self._producer.send(self._name, value=data)
         self._producer.flush()
-        self._logger.debug(f"Data sent to Kafka topic {self._name}")
+        self._logger.debug("Data sent to Kafka topic %s", self._name)
 
     def close(self) -> None:
         """Close the Kafka producer connection."""

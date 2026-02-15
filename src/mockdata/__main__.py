@@ -3,7 +3,6 @@
 import os
 import sys
 import json
-from pathlib import Path
 
 from mockdata.core.mock_data import MockData
 from mockdata.providers import EJsonProvider, MongoDBProvider, KafkaProvider
@@ -25,14 +24,14 @@ def read_schemas() -> dict:
     schemas_path = get_project_path("schemas")
 
     if not schemas_path.exists():
-        logger.error(f"Schemas directory not found: {schemas_path}")
+        logger.error("Schemas directory not found: %s", schemas_path)
         return schemas
 
     for filename in os.listdir(schemas_path):
         if filename.endswith(".json"):
             file_path = schemas_path / filename
-            logger.info(f"Loading: {cyan(filename)}")
-            with open(file_path, 'r') as file:
+            logger.info("Loading: %s", cyan(filename))
+            with open(file_path, "r", encoding="utf-8") as file:
                 schemas[filename] = json.load(file)
 
     logger.info(bold(green(f"All schemas loaded successfully. ({len(schemas)} schemas)")))
@@ -65,7 +64,7 @@ def show_progress(current: int, total: int) -> None:
         current: Current progress count.
         total: Total count for completion.
     """
-    spinner = ['|', '/', '-', '\\']
+    spinner = ["|", "/", "-", "\\"]
     percentage = round(current / total * 100, 2) if total > 0 else 0
     sys.stdout.write(f"\r{spinner[current % len(spinner)]} {percentage}%")
     sys.stdout.flush()
@@ -89,7 +88,7 @@ def main() -> None:
             add_providers(mock_data, config)
 
             processed_count = 0
-            for obj in mock_data.run():
+            for _ in mock_data.run():
                 processed_count += 1
                 show_progress(processed_count, mock_data._count)
 
@@ -99,15 +98,19 @@ def main() -> None:
             sys.stdout.write("\r")
             sys.stdout.flush()
 
-            logger.info(bold(green(
-                f"Successfully mocked {processed_count} objects for schema: {schema['name']}"
-            )))
+            logger.info(
+                bold(
+                    green(
+                        f"Successfully mocked {processed_count} objects for schema: {schema['name']}"
+                    )
+                )
+            )
 
     except KeyboardInterrupt:
         logger.info("\nOperation cancelled by user.")
         sys.exit(0)
     except Exception as e:
-        logger.error(f"Error: {e}", exc_info=True)
+        logger.error("Error: %s", e, exc_info=True)
         sys.exit(1)
 
 

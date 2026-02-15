@@ -24,12 +24,10 @@ class OutputProvider(ABC):
         Args:
             data: Dictionary containing the mock data to write.
         """
-        pass
 
     @abstractmethod
     def close(self) -> None:
         """Close any resources and cleanup."""
-        pass
 
     def set_name(self, name: str) -> None:
         """Set the name for the output (e.g., collection, topic, file).

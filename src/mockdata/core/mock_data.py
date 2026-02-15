@@ -34,6 +34,15 @@ class MockData:
         self._exp_pattern = re.compile(r"\#(\w+)(?:\((.*?)\))?\#")
         self._output_providers = []
 
+    @property
+    def count(self) -> int:
+        """Get the number of mock data objects to generate.
+
+        Returns:
+            int: The count of mock data objects to generate.
+        """
+        return self._count
+
     def add_provider(self, provider: OutputProvider) -> None:
         """Add an output provider to the MockData instance.
 

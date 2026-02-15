@@ -8,10 +8,8 @@ version = "0.2.0"
 description = "A flexible mock data generator based on JSON schemas with support for MongoDB, Kafka, and EJSON outputs"
 readme = "README.md"
 requires-python = ">=3.11"
-license = {text = "MIT"}
-authors = [
-    {name = "Mock Data Team"}
-]
+license = { text = "MIT" }
+authors = [{ name = "Mock Data Team" }]
 keywords = ["mock", "data", "generator", "faker", "mongodb", "kafka", "testing"]
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -52,7 +50,7 @@ Repository = "https://github.com/yourusername/mockdata"
 Issues = "https://github.com/yourusername/mockdata/issues"
 
 [tool.setuptools]
-package-dir = {"" = "src"}
+package-dir = { "" = "src" }
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -111,10 +109,7 @@ addopts = "-v --cov=mockdata --cov-report=term-missing --cov-report=html"
 
 [tool.coverage.run]
 source = ["src/mockdata"]
-omit = [
-    "*/tests/*",
-    "*/__pycache__/*",
-]
+omit = ["*/tests/*", "*/__pycache__/*"]
 
 [tool.coverage.report]
 exclude_lines = [
@@ -130,7 +125,7 @@ exclude_lines = [
 
 [tool.pylint.messages_control]
 # W0511: Used when a warning note as FIXME or TODO is detected
-disable = ["W0511"]
+disable = ["W0511", "C0103"]
 
 [tool.pylint.format]
 max-line-length = 100

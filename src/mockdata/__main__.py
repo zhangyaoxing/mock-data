@@ -90,7 +90,7 @@ def main() -> None:
             processed_count = 0
             for _ in mock_data.run():
                 processed_count += 1
-                show_progress(processed_count, mock_data._count)
+                show_progress(processed_count, mock_data.count)
 
             mock_data.close()
 
@@ -108,9 +108,6 @@ def main() -> None:
 
     except KeyboardInterrupt:
         logger.info("\nOperation cancelled by user.")
-        sys.exit(0)
-    except Exception as e:
-        logger.error("Error: %s", e, exc_info=True)
         sys.exit(1)
 
 

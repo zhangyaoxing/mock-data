@@ -1,11 +1,14 @@
 {
-    // Python 配置
     "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
+    "python.terminal.activateEnvironment": true,
+    "python.terminal.activateEnvInCurrentTerminal": true,
+    // 调试配置
+    "python.testing.debugPort": 5678,
+    "python.testing.autoTestDiscoverOnSaveEnabled": true,
     // 格式化配置
     "editor.formatOnSave": true,
     "editor.formatOnPaste": false,
     "editor.formatOnType": false,
-    // Python 格式化器
     "[python]": {
         "editor.defaultFormatter": "ms-python.black-formatter",
         "editor.formatOnSave": true,
@@ -13,24 +16,19 @@
             "source.organizeImports": "explicit"
         }
     },
-    // Black 配置
     "black-formatter.args": [
         "--line-length=100"
     ],
-    // isort 配置
     "isort.args": [
         "--profile=black",
         "--line-length=100"
     ],
-    // Pylint 配置
     "pylint.args": [
         "--disable=W0511"
     ],
-    // 其他编辑器配置
     "files.trimTrailingWhitespace": true,
     "files.insertFinalNewline": true,
     "files.trimFinalNewlines": true,
-    // JSON/TOML/YAML 格式化
     "[json]": {
         "editor.defaultFormatter": "vscode.json-language-features",
         "editor.formatOnSave": true
@@ -48,13 +46,11 @@
     "[markdown]": {
         "files.trimTrailingWhitespace": false
     },
-    // Python 测试配置
     "python.testing.pytestEnabled": true,
     "python.testing.unittestEnabled": false,
     "python.testing.pytestArgs": [
         "tests"
     ],
-    // 文件排除配置
     "files.exclude": {
         "**/__pycache__": true,
         "**/*.pyc": true,
@@ -64,7 +60,6 @@
         "**/htmlcov": true,
         "**/*.egg-info": true
     },
-    // 搜索排除配置
     "search.exclude": {
         "**/__pycache__": true,
         "**/*.pyc": true,
@@ -74,5 +69,8 @@
         "**/*.egg-info": true,
         "**/dist": true,
         "**/build": true
-    }
+    },
+    "python.analysis.extraPaths": [
+        "./src"
+    ]
 }

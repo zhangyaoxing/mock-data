@@ -2,6 +2,26 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Launch",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/mockdata/__main__.py",
+            "args": [
+                "--schemas",
+                "${workspaceFolder}/schemas/compass-schema.json",
+                "--output-type",
+                "ejson",
+                "output"
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}/src",
+                "LOG_LEVEL": "INFO"
+            }
+        },
+        {
             "name": "Python: Debug test_simple_ai",
             "type": "debugpy",
             "request": "launch",

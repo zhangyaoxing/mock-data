@@ -5,6 +5,8 @@ import sys
 import uuid
 from datetime import date, datetime
 from decimal import Decimal
+from logging import getLogger
+from typing import Any, Optional, Union
 
 from bson import Binary, Decimal128, ObjectId
 from faker import Faker
@@ -12,8 +14,8 @@ from faker import Faker
 from mockdata.core.constants import BSON_TYPES
 from mockdata.core.fake_providers import ObjectIdProvider
 from mockdata.providers.base import OutputProvider
-from mockdata.utils.logging import get_logger
-from mockdata.utils.colors import red, cyan, yellow
+from mockdata.utils.colors import cyan, red
+from mockdata.utils.simple_ai import SimpleAI
 
 
 class MockData:
@@ -28,11 +30,12 @@ class MockData:
         self._fake = Faker()
         self._fake.add_provider(ObjectIdProvider)
         self._schema = schema
-        self._count = self._schema.get("count", 1)
-        self._name = self._schema.get("name", f"{self._fake.slug()}")
-        self._logger = get_logger(__name__)
+        self._count: int = self._schema.get("count", 100)
+        self._name: str = self._schema.get("ns", f"{self._fake.slug()}")
+        self._logger = getLogger(__name__)
         self._exp_pattern = re.compile(r"\#(\w+)(?:\((.*?)\))?\#")
-        self._output_providers = []
+        self._output_providers: list[OutputProvider] = []
+        self._ai = SimpleAI()
 
     @property
     def count(self) -> int:
@@ -43,7 +46,7 @@ class MockData:
         """
         return self._count
 
-    def add_provider(self, provider: OutputProvider) -> None:
+    def add_output_provider(self, provider: OutputProvider) -> None:
         """Add an output provider to the MockData instance.
 
         Args:
@@ -67,7 +70,7 @@ class MockData:
         self._logger.info("Processing schema: %s", cyan(self._name))
 
         def get_result():
-            result = self._mock_fields(self._schema.get("$jsonSchema", {}).get("properties", {}))
+            result = self._mock_fields(self._schema.get("jsonSchema", {}).get("properties", {}))
             for provider in self._output_providers:
                 provider.write(result)
             return result
@@ -80,7 +83,7 @@ class MockData:
         for provider in self._output_providers:
             provider.close()
 
-    def _mock_fields(self, properties: dict) -> dict:
+    def _mock_fields(self, properties: dict) -> dict[str, Any]:
         """Generate mock data for fields based on their schema.
 
         Args:
@@ -92,31 +95,43 @@ class MockData:
         Raises:
             SystemExit: If field schema is invalid or type conversion fails.
         """
-        obj = {}
+        obj: dict[str, Any] = {}
         for field_name, field_schema in properties.items():
             bson_type = field_schema.get("bsonType", None)
-            bson_type = BSON_TYPES.get(bson_type, bson_type)
+            if isinstance(bson_type, list):
+                # If bsonType is a list, we will randomly select one type from the list for generation.
+                # TODO: allow multiple types generation for the same field as per JSON schema spec.
+                bson_type = self._fake.random_element(elements=bson_type)
+            if bson_type not in BSON_TYPES:
+                self._logger.fatal(
+                    "Field %s has invalid or missing bsonType: %s. Skip...",
+                    red(field_name),
+                    red(bson_type),
+                )
+                continue
             enum = field_schema.get("enum", None)
 
-            if not bson_type:
-                self._logger.fatal("Field %s has no bsonType defined.", red(field_name))
-                sys.exit(1)
-
+            converted_value: Any
             # Generate value based on type
-            if bson_type not in ["object", "array"]:
-                description = field_schema.get("description", None)
-                if description:
-                    value_desc = self._resolve_description(description)
-                    gen_method = getattr(self._fake, value_desc["gen_method"], None)
-                    if not gen_method:
-                        self._logger.fatal(
-                            "Generator method %s not found for field %s.",
-                            red(value_desc["gen_method"]),
-                            red(field_name),
-                        )
-                        sys.exit(1)
-                    value = gen_method(*value_desc["params"])
-                elif enum:
+            if bson_type == "object":
+                sub_properties = field_schema.get("properties", {})
+                converted_value = self._mock_fields(sub_properties)
+            elif bson_type == "array":
+                # TODO: Support multi-schema arrays as per JSON schema spec
+                item_schema = field_schema.get("items", {})
+                min_items = field_schema.get("minItems", 0)
+                max_items = field_schema.get("maxItems", 5)
+                item_count = self._fake.random_int(min=min_items, max=max_items)
+                items = []
+                for _ in range(item_count):
+                    item_value = self._mock_fields({"item": item_schema})
+                    items.append(item_value.get("item", None))
+                converted_value = items
+            else:
+                value: Any
+                if enum:
+                    # Bson type enum fields should have a non-empty list of possible values.
+                    # The generator will randomly select one value from the list.
                     if not isinstance(enum, list) or len(enum) == 0:
                         self._logger.fatal(
                             "Enum for field %s must be a non-empty list.", red(field_name)
@@ -124,27 +139,41 @@ class MockData:
                         sys.exit(1)
                     value = self._fake.random_element(elements=enum)
                 else:
-                    self._logger.fatal(
-                        "Field %s has no description or enum defined.", red(field_name)
-                    )
-                    sys.exit(1)
-            else:
-                value = None
+                    # Compass generated schemas don't have description.
+                    description = field_schema.get("description", "")
+                    method, params = self._resolve_description(description)
+                    if not method:
+                        method = self._ai.guess(field_name, bson_type)
+                        # Save the guessed method back to description,
+                        # so we don't have to guess again for the same field.
+                        field_schema["description"] = f"#{method}#"
+                    gen_method = getattr(self._fake, method, None)
+                    if not gen_method:
+                        self._logger.fatal(
+                            "Generator method %s not found for field %s.",
+                            red(method),
+                            red(field_name),
+                        )
+                        sys.exit(1)
+                    value = gen_method(*params)
 
-            # Convert value based on BSON type
-            converted_value = self._convert_value(
-                bson_type,
-                value,
-                field_name,
-                field_schema,
-                value_desc if "value_desc" in locals() else None,
-            )
+                # Convert value based on BSON type
+                converted_value = self._convert_value(
+                    bson_type,
+                    value,
+                    field_name,
+                    {"gen_method": method, "params": params} if method else None,
+                )
             obj[field_name] = converted_value
 
         return obj
 
     def _convert_value(
-        self, bson_type: str, value, field_name: str, field_schema: dict, value_desc: dict = None
+        self,
+        bson_type: str,
+        value: Any,
+        field_name: str,
+        value_desc: Optional[dict] = None,
     ):
         """Convert a value to the appropriate BSON type.
 
@@ -152,7 +181,6 @@ class MockData:
             bson_type: Target BSON type.
             value: Value to convert.
             field_name: Name of the field (for error messages).
-            field_schema: Schema definition for the field.
             value_desc: Description of value generation method.
 
         Returns:
@@ -178,7 +206,7 @@ class MockData:
                 if value_desc and value_desc["gen_method"] == "uuid4":
                     try:
                         u = uuid.UUID(value)
-                        return Binary(u.bytes, u.version)
+                        return Binary(u.bytes, u.version)  # type: ignore
                     except ValueError:
                         self._logger.fatal(
                             red(f"Expected UUID for field {field_name}, got {type(value)}.")
@@ -244,47 +272,31 @@ class MockData:
                     )
                     sys.exit(1)
 
-            case "object":
-                sub_properties = field_schema.get("properties", {})
-                return self._mock_fields(sub_properties)
-
-            case "array":
-                # TODO: Support multi-schema arrays as per JSON schema spec
-                item_schema = field_schema.get("items", {})
-                min_items = field_schema.get("minItems", 0)
-                max_items = field_schema.get("maxItems", 5)
-                item_count = self._fake.random_int(min=min_items, max=max_items)
-                items = []
-                for _ in range(item_count):
-                    item_value = self._mock_fields({"item": item_schema})
-                    items.append(item_value["item"])
-                return items
-
             case _:
                 self._logger.fatal(red(f"Unsupported bsonType {bson_type} for field {field_name}."))
                 sys.exit(1)
 
-    def _resolve_description(self, description: str) -> dict:
+    def _resolve_description(self, description: str) -> tuple[Optional[str], list]:
         """Parse description string to extract generator method and parameters.
 
         Args:
             description: Description string in format #method(param1,param2)#
 
         Returns:
-            dict: Dictionary with 'gen_method' and 'params' keys.
+            tuple[str | None, list]: Tuple with generator method and parameters list,
+            or (None, []) if description is invalid.
 
         Raises:
             SystemExit: If description format is invalid.
         """
-        matched = self._exp_pattern.search(description)
+        matched: Optional[re.Match[str]] = self._exp_pattern.search(description)
         if not matched:
-            self._logger.fatal(yellow(f"Invalid description format: {description}"))
-            sys.exit(1)
+            return None, []
+        gen_method: str = matched.group(1) if matched else "text"
+        params_str: Optional[str] = matched.group(2) if matched else None
+        params: list[str] = params_str.split(",") if params_str and params_str != "" else []
 
-        gen_method = matched.group(1) if matched else "text"
-        params_str = matched.group(2) if matched else None
-        params = params_str.split(",") if params_str and params_str != "" else []
-        converted_params = []
+        converted_params: list[Union[int, float, bool, None, str]] = []
 
         # Convert parameter strings to appropriate types
         for param in params:
@@ -298,10 +310,12 @@ class MockData:
             elif param in ("null", "none"):
                 converted_params.append(None)
             elif re.match(r"^\'(.*)\'$", param):
-                converted_params.append(re.match(r"^\'(.*)\'$", param).group(1))
+                m = re.match(r"^\'(.*)\'$", param)
+                converted_params.append(m.group(1) if m else param)
             elif re.match(r'^"(.*)"$', param):
-                converted_params.append(re.match(r'^"(.*)"$', param).group(1))
+                m = re.match(r'^"(.*)"$', param)
+                converted_params.append(m.group(1) if m else param)
             else:
                 converted_params.append(param)
 
-        return {"gen_method": gen_method, "params": converted_params}
+        return gen_method, converted_params

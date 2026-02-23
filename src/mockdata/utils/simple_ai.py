@@ -26,13 +26,13 @@ class SimpleAI:
         "bytes": ["binData", "string"],
         "int": ["int", "long", "decimal", "string"],
         "time": ["date", "string"],
-        "ObjectId": ["ObjectId", "string"],
+        "ObjectId": ["objectId", "string"],
         "datetime": ["date", "string"],
     }
+    client = chromadb.Client()
+    collection = client.get_or_create_collection(name="methods")
 
     def __init__(self):
-        self.client = chromadb.Client()
-        self.collection = self.client.get_or_create_collection(name="methods")
         self.logger = getLogger(self.__class__.__name__)
         self.add_methods()
 
@@ -70,14 +70,14 @@ class SimpleAI:
                     )
                 except (TypeError, AttributeError):
                     continue
-        self.collection.add(ids=ids, documents=docs, metadatas=metadatas)  # type: ignore[arg-type]
+        SimpleAI.collection.add(ids=ids, documents=docs, metadatas=metadatas)  # type: ignore[arg-type]
         self.logger.info("Added %d methods to ChromaDB collection.", len(ids))
 
     def guess(self, field_name: str, bson_type: str) -> str:
         """Guess the generator method based on field name and bson type."""
         # If the return type of a method cannot be converted to the bson type,
         # we will not consider this method as a candidate.
-        result = self.collection.query(
+        result = SimpleAI.collection.query(
             query_texts=[field_name],
             n_results=1,
             where={"bson_types": {"$contains": bson_type}},  # type: ignore

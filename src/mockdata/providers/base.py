@@ -1,7 +1,7 @@
 """Base output provider interface."""
 
 from abc import ABC, abstractmethod
-from mockdata.utils.logging import get_logger
+from logging import getLogger
 
 
 class OutputProvider(ABC):
@@ -14,7 +14,7 @@ class OutputProvider(ABC):
             config: Configuration dictionary for the provider.
         """
         self._config = config
-        self._logger = get_logger(__name__)
+        self._logger = getLogger(__name__)
         self._name = None
 
     @abstractmethod

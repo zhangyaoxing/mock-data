@@ -13,7 +13,7 @@ from faker import Faker
 
 from mockdata.core.constants import BSON_TYPES
 from mockdata.core.fake_providers import ObjectIdProvider
-from mockdata.providers.base import OutputProvider
+from mockdata.providers.base_provider import OutputProvider
 from mockdata.utils.colors import cyan, red, yellow
 from mockdata.utils.simple_ai import SimpleAI
 

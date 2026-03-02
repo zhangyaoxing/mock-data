@@ -1,8 +1,11 @@
 """EJSON file output provider."""
 
+from pathlib import Path
+from typing import Optional, TextIO
+
 from bson import json_util
 
-from mockdata.providers.base import OutputProvider
+from mockdata.providers.base_provider import OutputProvider
 from mockdata.utils.path import get_project_path
 
 
@@ -16,7 +19,7 @@ class EJsonProvider(OutputProvider):
             config: Configuration with 'folder' key for output directory.
         """
         super().__init__(config)
-        self._file = None
+        self._file: Optional[TextIO] = None
         self._logger.debug("Initialized EJsonProvider with config: %s", config)
 
     def write(self, data: dict) -> None:
@@ -27,7 +30,7 @@ class EJsonProvider(OutputProvider):
         """
         if not self._file:
             folder = self._config.get("folder", "data")
-            file_path = get_project_path(folder, f"{self._name}.ejson")
+            file_path: Path = get_project_path(folder, f"{self._name}.ejson")
 
             # Ensure directory exists
             file_path.parent.mkdir(parents=True, exist_ok=True)

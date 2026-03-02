@@ -15,7 +15,7 @@ class OutputProvider(ABC):
         """
         self._config = config
         self._logger = getLogger(__name__)
-        self._name = None
+        self._name: str = None
 
     @abstractmethod
     def write(self, data: dict) -> None:

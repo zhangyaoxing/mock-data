@@ -3,7 +3,7 @@
 from bson import json_util
 from kafka import KafkaProducer
 
-from mockdata.providers.base import OutputProvider
+from mockdata.providers.base_provider import OutputProvider
 
 
 class KafkaProvider(OutputProvider):

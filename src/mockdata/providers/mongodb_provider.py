@@ -1,12 +1,13 @@
 """MongoDB output provider."""
 
-from typing import Optional, List
+from typing import List, Optional
 
 from pymongo import MongoClient
 from pymongo.collection import Collection
 from pymongo.database import Database
 
-from mockdata.providers.base import OutputProvider
+from mockdata.providers.base_provider import OutputProvider
+from mockdata.utils.colors import red
 
 
 class MongoDBProvider(OutputProvider):
@@ -40,11 +41,22 @@ class MongoDBProvider(OutputProvider):
         Args:
             docs: List of documents to insert.
         """
-        if self._collection is None:
-            self._collection = self._db[self._name]
+        if self._collection is not None:
+            self._collection.insert_many(docs)
+            self._logger.debug("Inserted %d documents into collection %s", len(docs), self._name)
+        else:
+            self._logger.error(red("No MongoDB collection set. Call .set_name() first."))
 
-        self._collection.insert_many(docs)
-        self._logger.debug("Inserted %d documents into collection %s", len(docs), self._name)
+    def set_name(self, name: str) -> None:
+        if "." in name:
+            db_name, collection_name = name.split(".", 1)
+            if self._client is not None:
+                self._db = self._client[db_name]
+                self._collection = self._db[collection_name]
+        else:
+            if self._db is not None:
+                self._collection = self._db[name]
+        self._logger.debug("Set MongoDB collection to %s", name)
 
     def write(self, data: dict) -> None:
         """Buffer data and write in batches to MongoDB.

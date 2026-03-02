@@ -14,7 +14,7 @@ from faker import Faker
 from mockdata.core.constants import BSON_TYPES
 from mockdata.core.fake_providers import ObjectIdProvider
 from mockdata.providers.base import OutputProvider
-from mockdata.utils.colors import cyan, red
+from mockdata.utils.colors import cyan, red, yellow
 from mockdata.utils.simple_ai import SimpleAI
 
 
@@ -103,10 +103,10 @@ class MockData:
                 # TODO: allow multiple types generation for the same field as per JSON schema spec.
                 bson_type = self._fake.random_element(elements=bson_type)
             if bson_type not in BSON_TYPES:
-                self._logger.fatal(
+                self._logger.warning(
                     "Field %s has invalid or missing bsonType: %s. Skip...",
-                    red(field_name),
-                    red(bson_type),
+                    yellow(field_name),
+                    yellow(bson_type),
                 )
                 continue
             enum = field_schema.get("enum", None)

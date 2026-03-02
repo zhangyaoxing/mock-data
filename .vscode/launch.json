@@ -8,12 +8,14 @@
             "program": "${workspaceFolder}/src/mockdata/__main__.py",
             "args": [
                 "--schemas",
-                "${workspaceFolder}/schemas/compass-schema.json",
+                "${workspaceFolder}/schemas/BookStore.json",
                 "--output-type",
+                // "mongodb",
                 "ejson",
                 "--num-objects",
-                "50",
+                "100",
                 "output"
+                // "mongodb://localhost:27017/test"
             ],
             "console": "integratedTerminal",
             "justMyCode": false,

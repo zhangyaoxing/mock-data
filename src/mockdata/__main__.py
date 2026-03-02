@@ -132,6 +132,7 @@ def parse_args() -> dict:
 
 def main() -> None:
     """Main entry point for the CLI."""
+    init_logging()
     logger = getLogger(__name__)
     args = parse_args()
     num_objects: int = args.get("num_objects", 100)
@@ -203,5 +204,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    init_logging()
     main()

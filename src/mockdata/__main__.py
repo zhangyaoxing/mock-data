@@ -10,8 +10,9 @@ from typing import Any
 from mockdata.core.mock_data import MockData
 from mockdata.core.read_schemas import read_compass_schema, read_schemas
 from mockdata.providers import EJsonProvider, KafkaProvider, MongoDBProvider
-from mockdata.utils import bold, cyan, green, red
+from mockdata.utils import bold, cyan, green, red, yellow
 from mockdata.utils.logging import init_logging
+from mockdata.utils.simple_ai import DBPATH, SimpleAI
 
 
 def show_progress(current: int, total: int) -> None:
@@ -56,6 +57,12 @@ def parse_args() -> dict:
         type=int,
         default=100,
         help="Number of objects to generate (default: 100)",
+    )
+    arg_parser.add_argument(
+        "-r",
+        "--refresh",
+        action="store_true",
+        help="Refresh the ChromaDB collection with Faker methods. Use this if you have updated Faker or added custom providers. Default: False",
     )
     arg_parser.add_argument(
         "target",
@@ -152,6 +159,11 @@ def main() -> None:
         except (FileNotFoundError, json.JSONDecodeError, PermissionError, OSError) as e:
             logger.fatal(red(f"Failed to read schema from Compass JSON file: {e}"))
             sys.exit(1)
+
+    refresh: bool = args.get("refresh", False)
+    if refresh:
+        logger.info(yellow("Refreshing ChromaDB collection with Faker methods..."))
+        SimpleAI.refresh_methods()
 
     try:
         logger.info(cyan("Mocking data based on the provided schemas."))

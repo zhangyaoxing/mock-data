@@ -1,11 +1,16 @@
 """Guess generator methods based on field names and bson types using a simple AI approach."""
 
+import shutil
 from logging import getLogger
+from pathlib import Path
 
 import chromadb
 from faker import Faker
 
 from mockdata.core.fake_providers import ObjectIdProvider
+
+DBPATH: str = str(Path.home() / ".mock_data/chromadb")
+COLLECTION_NAME: str = "methods"
 
 
 class SimpleAI:
@@ -29,22 +34,34 @@ class SimpleAI:
         "ObjectId": ["objectId", "string"],
         "datetime": ["date", "string"],
     }
-    client = chromadb.Client()
-    collection = client.get_or_create_collection(name="methods")
+    client = chromadb.PersistentClient(path=DBPATH)
+    collection = client.get_or_create_collection(name=COLLECTION_NAME)
 
     def __init__(self):
         self.logger = getLogger(self.__class__.__name__)
-        self.add_methods()
+        if not SimpleAI.collection.count():
+            # First time running the program, we need to populate the ChromaDB collection with Faker methods.
+            SimpleAI.add_methods()
 
-    def add_methods(self):
+    @staticmethod
+    def refresh_methods():
+        """Refresh the ChromaDB collection with Faker methods. Use this if you have updated Faker or added custom providers."""
+        SimpleAI.client.delete_collection(name=COLLECTION_NAME)
+        SimpleAI.collection = SimpleAI.client.get_or_create_collection(name=COLLECTION_NAME)
+        SimpleAI.add_methods()
+
+    @staticmethod
+    def add_methods():
         """Add Faker methods to the ChromaDB collection."""
-        self.logger.info("Inspecting Faker methods...")
+        logger = getLogger(SimpleAI.__name__)
+        logger.info("Inspecting Faker methods to initialize...")
         fake = Faker()
         fake.add_provider(ObjectIdProvider)
         methods = dir(fake)
         ids = []
         docs = []
         metadatas = []
+
         for m in methods:
             if m.startswith("_") or m in SimpleAI.EXCLUDE_LIST:
                 continue
@@ -62,7 +79,7 @@ class SimpleAI:
                     # This achieves a better match with field names that don't have this prefix.
                     docs.append(m if not m.startswith("py") else m[2:])
                     metadatas.append({"bson_types": bson_types})
-                    self.logger.debug(
+                    logger.debug(
                         "Added generator method '%s' with result type '%s' for bson types %s",
                         m,
                         res_type,
@@ -71,7 +88,7 @@ class SimpleAI:
                 except (TypeError, AttributeError):
                     continue
         SimpleAI.collection.add(ids=ids, documents=docs, metadatas=metadatas)  # type: ignore[arg-type]
-        self.logger.info("Added %d methods to ChromaDB collection.", len(ids))
+        logger.info("Added %d methods to ChromaDB collection.", len(ids))
 
     def guess(self, field_name: str, bson_type: str) -> str:
         """Guess the generator method based on field name and bson type."""

@@ -1,0 +1,163 @@
+{
+  "collections": {
+    "Foo.Author": {
+      "ns": "Foo.Author",
+      "jsonSchema": {
+        "bsonType": "object",
+        "properties": {
+          "_id": {
+            "bsonType": "objectId"
+          },
+          "firstName": {
+            "bsonType": "string"
+          },
+          "lastName": {
+            "bsonType": "string"
+          },
+          "email": {
+            "bsonType": "string"
+          },
+          "im": {
+            "bsonType": "object",
+            "properties": {
+              "whatsapp": {
+                "bsonType": "string"
+              },
+              "line": {
+                "bsonType": "string"
+              },
+              "facebook": {
+                "bsonType": "string"
+              }
+            },
+            "required": []
+          },
+          "phone": {
+            "bsonType": "string"
+          }
+        },
+        "required": [
+          "_id"
+        ]
+      }
+    },
+    "Foo.Book": {
+      "ns": "Foo.Book",
+      "jsonSchema": {
+        "bsonType": "object",
+        "properties": {
+          "_id": {
+            "bsonType": "objectId"
+          },
+          "name": {
+            "bsonType": "string"
+          },
+          "ISBN": {
+            "bsonType": "string"
+          },
+          "publishDate": {
+            "bsonType": [
+              "date"
+            ]
+          },
+          "authroID": {
+            "bsonType": [
+              "objectId"
+            ]
+          },
+          "publisherID": {
+            "bsonType": [
+              "objectId"
+            ]
+          }
+        },
+        "required": [
+          "_id"
+        ]
+      }
+    },
+    "Foo.Publisher": {
+      "ns": "Foo.Publisher",
+      "jsonSchema": {
+        "bsonType": "object",
+        "properties": {
+          "_id": {
+            "bsonType": "objectId"
+          },
+          "name": {
+            "bsonType": "string"
+          },
+          "address": {
+            "bsonType": "object",
+            "properties": {
+              "street": {
+                "bsonType": "string"
+              },
+              "city": {
+                "bsonType": "string"
+              },
+              "state": {
+                "bsonType": "string"
+              },
+              "country": {
+                "bsonType": "string"
+              }
+            },
+            "required": []
+          },
+          "contactNumber": {
+            "bsonType": "string"
+          },
+          "faxNumber": {
+            "bsonType": "string"
+          }
+        },
+        "required": [
+          "_id"
+        ]
+      }
+    }
+  },
+  "relationships": [
+    {
+      "id": "c65c8074-64e0-4345-9bef-5bb7710418d2",
+      "relationship": [
+        {
+          "ns": "Foo.Book",
+          "cardinality": 100,
+          "fields": [
+            "authroID"
+          ]
+        },
+        {
+          "ns": "Foo.Author",
+          "cardinality": 100,
+          "fields": [
+            "_id"
+          ]
+        }
+      ],
+      "isInferred": false
+    },
+    {
+      "id": "5fb71818-28a1-4189-aa92-ebb7cd5addde",
+      "relationship": [
+        {
+          "ns": "Foo.Book",
+          "cardinality": 10000,
+          "fields": [
+            "publisherID"
+          ]
+        },
+        {
+          "ns": "Foo.Publisher",
+          "cardinality": 1,
+          "fields": [
+            "_id"
+          ]
+        }
+      ],
+      "isInferred": false
+    }
+  ]
+}

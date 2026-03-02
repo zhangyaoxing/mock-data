@@ -11,6 +11,8 @@
                 "${workspaceFolder}/schemas/compass-schema.json",
                 "--output-type",
                 "ejson",
+                "--num-objects",
+                "50",
                 "output"
             ],
             "console": "integratedTerminal",

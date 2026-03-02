@@ -51,6 +51,13 @@ def parse_args() -> dict:
         help="Output type (default: ejson). Options: ejson, mongodb, kafka",
     )
     arg_parser.add_argument(
+        "-n",
+        "--num-objects",
+        type=int,
+        default=100,
+        help="Number of objects to generate (default: 100)",
+    )
+    arg_parser.add_argument(
         "target",
         nargs="?",
         help="""Depending on the target argument, specify
@@ -120,6 +127,7 @@ def main() -> None:
     """Main entry point for the CLI."""
     logger = getLogger(__name__)
     args = parse_args()
+    num_objects: int = args.get("num_objects", 100)
     output_type: str = str(args.get("output_type")).lower()
     schemas_type: str = str(args.get("schemas_type"))
     schemas: dict[str, Any]
@@ -150,7 +158,7 @@ def main() -> None:
         target: str = str(args.get("target"))
         collections: dict[str, Any] = schemas.get("collections", {})
         for _, schema in collections.items():
-            mock_data = MockData(schema)
+            mock_data = MockData(schema, num_objects)
             if output_type == "ejson":
                 mock_data.add_output_provider(EJsonProvider({"folder": target}))
             elif output_type == "mongodb":

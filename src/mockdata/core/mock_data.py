@@ -21,16 +21,19 @@ from mockdata.utils.simple_ai import SimpleAI
 class MockData:
     """Main class for generating mock data based on JSON schemas."""
 
-    def __init__(self, schema: dict):
+    def __init__(self, schema: dict, num_objects: Optional[int] = 100):
         """Initialize MockData with a schema.
 
         Args:
             schema: Dictionary containing the JSON schema with count and properties.
+            num_objects: Number of objects to generate (default: 100).
         """
         self._fake = Faker()
         self._fake.add_provider(ObjectIdProvider)
         self._schema = schema
-        self._count: int = self._schema.get("count", 100)
+        self._count: int = (
+            num_objects if num_objects is not None else self._schema.get("count", 100)
+        )
         self._name: str = self._schema.get("ns", f"{self._fake.slug()}")
         self._logger = getLogger(__name__)
         self._exp_pattern = re.compile(r"\#(\w+)(?:\((.*?)\))?\#")

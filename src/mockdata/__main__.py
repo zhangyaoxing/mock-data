@@ -67,10 +67,9 @@ def parse_args() -> dict:
     arg_parser.add_argument(
         "target",
         nargs="?",
-        help="""Depending on the target argument, specify
-        - folder for ejson
-        - connection string (mongodb:// or mongodb+srv://) for mongodb
-        - bootstrap server for kafka""",
+        help="Depending on the -t argument, specify folder for ejson, "
+        + "connection string (mongodb:// or mongodb+srv://) for mongodb, "
+        + "or bootstrap server for kafka",
     )
     # If schemas is a folder, we will read all JSON files in that folder.
     # If it's a single JSON file, we will read that file as compass exported schema.

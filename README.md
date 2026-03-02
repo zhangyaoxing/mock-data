@@ -20,7 +20,7 @@ A flexible and powerful mock data generator based on JSON schemas. Built on top 
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/mockdata.git
+git clone https://github.com/zhangyaoxing/mockdata.git
 cd mockdata
 
 # Install in development mode
@@ -169,23 +169,23 @@ Schemas are defined using [JSON Schema](https://json-schema.org/) with MongoDB B
 
 |        Type        | Number |   Alias    | Supported |
 | :----------------: | :----: | :--------: | :-------: |
-|       Double       |   1    |   double   |  ✅  |
-|       String       |   2    |   string   |  ✅  |
-|       Object       |   3    |   object   |  ✅  |
-|       Array        |   4    |   array    |  ✅  |
-|    Binary data     |   5    |  binData   |  ✅  |
-|      ObjectId      |   7    |  objectId  |  ✅  |
-|      Boolean       |   8    |    bool    |  ✅  |
-|        Date        |   9    |    date    |  ✅  |
-|        Null        |   10   |    null    |  ✅  |
-| Regular Expression |   11   |   regex    |  ❌  |
-|     JavaScript     |   13   | javascript |  ❌  |
-|   32-bit integer   |   16   |    int     |  ✅  |
-|     Timestamp      |   17   | timestamp  |  ❌  |
-|   64-bit integer   |   18   |    long    |  ✅  |
-|     Decimal128     |   19   |  decimal   |  ✅  |
-|      Min key       |   -1   |   minKey   |  ❌  |
-|      Max key       |  127   |   maxKey   |  ❌  |
+|       Double       |   1    |   double   |     ✅     |
+|       String       |   2    |   string   |     ✅     |
+|       Object       |   3    |   object   |     ✅     |
+|       Array        |   4    |   array    |     ✅     |
+|    Binary data     |   5    |  binData   |     ✅     |
+|      ObjectId      |   7    |  objectId  |     ✅     |
+|      Boolean       |   8    |    bool    |     ✅     |
+|        Date        |   9    |    date    |     ✅     |
+|        Null        |   10   |    null    |     ✅     |
+| Regular Expression |   11   |   regex    |     ❌     |
+|     JavaScript     |   13   | javascript |     ❌     |
+|   32-bit integer   |   16   |    int     |     ✅     |
+|     Timestamp      |   17   | timestamp  |     ❌     |
+|   64-bit integer   |   18   |    long    |     ✅     |
+|     Decimal128     |   19   |  decimal   |     ✅     |
+|      Min key       |   -1   |   minKey   |     ❌     |
+|      Max key       |  127   |   maxKey   |     ❌     |
 
 ### 3. Value Generation
 

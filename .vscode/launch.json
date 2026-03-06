@@ -26,23 +26,6 @@
             }
         },
         {
-            "name": "Python: Debug test_simple_ai",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "${workspaceFolder}/.venv/bin/pytest",
-            "args": [
-                "tests/test_simple_ai.py",
-                "-v",
-                "-s"
-            ],
-            "console": "integratedTerminal",
-            "justMyCode": false,
-            "cwd": "${workspaceFolder}",
-            "env": {
-                "PYTHONPATH": "${workspaceFolder}/src"
-            }
-        },
-        {
             "name": "Python: Debug Current Test",
             "type": "debugpy",
             "request": "launch",

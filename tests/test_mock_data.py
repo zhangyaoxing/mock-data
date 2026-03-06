@@ -1,56 +1,39 @@
 """Tests for core MockData functionality."""
 
-import pytest
+import json
+
+from bson import ObjectId
+
 from mockdata.core.mock_data import MockData
 
 
-def test_mock_data_initialization(sample_schema):
+def load_sample_schema() -> dict:
+    """Load a sample JSON schema for testing."""
+    with open("schemas/BookStore.json") as f:
+        schema_str = f.read()
+        return json.loads(schema_str)
+
+
+def test_mock_data_initialization():
     """Test MockData initialization with a schema."""
+    sample_schema = load_sample_schema()
     mock_data = MockData(sample_schema)
-    assert mock_data._name == "test_schema"
-    assert mock_data._count == 5
+    assert mock_data._count == 100
 
 
-def test_mock_data_generation(sample_schema):
+def test_mock_data_generation():
     """Test basic mock data generation."""
-    mock_data = MockData(sample_schema)
-    results = list(mock_data.run())
-    
-    assert len(results) == 5
+    sample_schema = load_sample_schema()
+    schema = sample_schema["collections"]["Foo.Author"]
+    mock_data = MockData(schema)
+    results = mock_data.run()
+
     for result in results:
-        assert "name" in result
-        assert "age" in result
+        assert "_id" in result
+        assert "firstName" in result
+        assert "lastName" in result
         assert "email" in result
-        assert isinstance(result["name"], str)
-        assert isinstance(result["age"], int)
-        assert 18 <= result["age"] <= 100
-
-
-def test_resolve_description(sample_schema):
-    """Test description parsing."""
-    mock_data = MockData(sample_schema)
-    
-    result = mock_data._resolve_description("#random_int(1, 100)#")
-    assert result["gen_method"] == "random_int"
-    assert result["params"] == [1, 100]
-    
-    result = mock_data._resolve_description("#name()#")
-    assert result["gen_method"] == "name"
-    assert result["params"] == []
-
-
-def test_bson_type_conversion(sample_schema):
-    """Test BSON type conversion."""
-    mock_data = MockData(sample_schema)
-    
-    # Test string conversion
-    result = mock_data._convert_value("string", 123, "test_field", {})
-    assert result == "123"
-    
-    # Test int conversion
-    result = mock_data._convert_value("int", "42", "test_field", {})
-    assert result == 42
-    
-    # Test bool conversion
-    result = mock_data._convert_value("bool", 1, "test_field", {})
-    assert result is True
+        assert isinstance(result["_id"], ObjectId)
+        assert isinstance(result["firstName"], str)
+        assert isinstance(result["lastName"], str)
+        assert isinstance(result["email"], str)

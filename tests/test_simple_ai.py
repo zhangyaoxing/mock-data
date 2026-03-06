@@ -12,7 +12,7 @@ def test_simple_ai():
     result = ai.guess("username", "string")
     assert result == "name"
 
-    result = ai.guess("objId", "ObjectId")
+    result = ai.guess("objId", "objectId")
     assert result == "object_id"
 
     result = ai.guess("created_at", "date")

@@ -6,7 +6,6 @@ from typing import Optional, TextIO
 from bson import json_util
 
 from mockdata.providers.base_provider import OutputProvider
-from mockdata.utils.path import get_project_path
 
 
 class EJsonProvider(OutputProvider):
@@ -30,7 +29,7 @@ class EJsonProvider(OutputProvider):
         """
         if not self._file:
             folder = self._config.get("folder", "data")
-            file_path: Path = get_project_path(folder, f"{self._name}.ejson")
+            file_path: Path = Path(folder) / f"{self._name}.ejson"
 
             # Ensure directory exists
             file_path.parent.mkdir(parents=True, exist_ok=True)

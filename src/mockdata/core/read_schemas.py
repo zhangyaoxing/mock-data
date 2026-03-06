@@ -1,12 +1,13 @@
 """Read JSON schema files from the schemas directory or Compass schema file."""
 
 import json
+import logging
 import os
 from pathlib import Path
 
-from mockdata.utils import bold, cyan, get_logger, green
+from mockdata.utils import bold, cyan, green
 
-logger = get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 
 def read_schemas(schemas_path: Path) -> dict:

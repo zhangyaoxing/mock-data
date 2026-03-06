@@ -11,7 +11,7 @@ def load_sample_schema() -> dict:
     """Load a sample JSON schema for testing."""
     with open("schemas/BookStore.json") as f:
         schema_str = f.read()
-        return json.loads(schema_str)
+        return json.loads(schema_str)  # type: ignore
 
 
 def test_mock_data_initialization():

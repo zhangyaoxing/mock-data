@@ -5,6 +5,7 @@ from typing import List, Optional
 from pymongo import MongoClient
 from pymongo.collection import Collection
 from pymongo.database import Database
+from pymongo.errors import ConfigurationError
 
 from mockdata.providers.base_provider import OutputProvider
 from mockdata.utils.colors import red
@@ -32,7 +33,10 @@ class MongoDBProvider(OutputProvider):
         """Establish connection to MongoDB."""
         uri = self._config.get("uri", "mongodb://localhost:27017/test")
         self._client = MongoClient(uri)
-        self._db = self._client.get_default_database()
+        try:
+            self._db = self._client.get_default_database()
+        except ConfigurationError:
+            self._db = self._client["test"]
         self._logger.debug("Connected to MongoDB at %s", uri)
 
     def _insert(self, docs: List[dict]) -> None:
